@@ -84,4 +84,14 @@ public class LoginTest extends WebFixture {
                 .isPageLoaded()
                 .checkFieldsEmpty();
     }
+
+    @Test(description = "Проверка закрытия уведомления об ошибке")
+    public void verifyCloseErrorMsg() {
+        new LoginPage()
+                .isPageLoaded()
+                .fillLoginForm("invalidEmail", TEST_PWD)
+                .clickSubmit()
+                .verifyEmailFormatError()
+                .closeErrorContainer();
+        }
 }
