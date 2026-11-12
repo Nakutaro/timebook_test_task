@@ -1,13 +1,10 @@
 package fixtures;
 
+import com.codeborne.selenide.*;
 import com.codeborne.selenide.logevents.SelenideLogger;
 import io.qameta.allure.Allure;
 import io.qameta.allure.Step;
 import io.qameta.allure.selenide.AllureSelenide;
-import com.codeborne.selenide.Selenide;
-import com.codeborne.selenide.SelenideConfig;
-import com.codeborne.selenide.SelenideDriver;
-import com.codeborne.selenide.WebDriverRunner;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.SessionId;
 import org.slf4j.Logger;
@@ -27,22 +24,14 @@ public abstract class WebFixture {
     @BeforeMethod(alwaysRun = true)
     @Parameters("browser")
     @Step("Открытие браузера")
-    public void openApplication(@Optional("chrome") String browser) {
+    public void openApplication(@Optional String browser) {
         SelenideLogger.addListener("AllureSelenide", new AllureSelenide()
                 .screenshots(true)
                 .savePageSource(true));
 
-        String targetBrowser = System.getProperty("selenide.browser", browser);
-        boolean isHeadless = Boolean.parseBoolean(System.getProperty("selenide.headless", "false"));
-
-        SelenideConfig config = new SelenideConfig()
-                .browser(targetBrowser)
-                .browserSize("1920x1080")
-                .timeout(6000)
-                .headless(isHeadless);
-
-        SelenideDriver driver = new SelenideDriver(config);
-        WebDriverRunner.setWebDriver(driver.getAndCheckWebDriver());
+        if (browser != null && !browser.isEmpty()) {
+            Configuration.browser = browser;
+        }
 
         URL pageUrl = Objects.requireNonNull(
                 getClass().getClassLoader().getResource("index.html"),

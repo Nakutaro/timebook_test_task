@@ -25,14 +25,14 @@ public class SearchTest extends WebFixture {
     }
 
     @Test(description = "После входа отображаются все 8 сотрудников по умолчанию")
-    public void defaultEmployeeListShownAfterLogin() {
+    public void defaultEmployeeList() {
         searchPage
                 .verifyResultsCount(8)
                 .verifyEmployeeInTable(0, "ivanov@company.ru", "Иван Иванов");
     }
 
     @Test(description = "Поиск по точному Email")
-    public void searchByExactEmail() {
+    public void searchByEmail() {
         searchPage
                 .filterByEmail("petrova@company.ru")
                 .clickSearch()
@@ -59,7 +59,7 @@ public class SearchTest extends WebFixture {
     }
 
     @Test(description = "Фильтрация по возрасту")
-    public void searchByExactAge() {
+    public void searchByAge() {
         searchPage
                 .filterByAge(26)
                 .clickSearch()
@@ -68,7 +68,7 @@ public class SearchTest extends WebFixture {
     }
 
     @Test(description = "Фильтрация по диапазону дат приёма")
-    public void searchByHireDateRange() {
+    public void searchByDateRange() {
         searchPage
                 .filterByDateFrom(LocalDate.of(2022, 1, 1))
                 .filterByDateTo(LocalDate.of(2024, 12, 31))
