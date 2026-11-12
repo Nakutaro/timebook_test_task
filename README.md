@@ -70,28 +70,32 @@ cd timebook_test_task
 
 ### 2. Запуск тестов
 * **Полный кроссбраузерный прогон (`regression.xml`, сьют по умолчанию):**
-  ```bash
+```bash
   mvn clean test
-  ```
+```
   *(или с явным указанием сьюта: `mvn clean test -Dsuite=regression`)*
 
 * **Быстрый Smoke-прогон (`smoke.xml`, только Chrome):**
-  ```bash
+```bash
   mvn clean test -Dsuite=smoke
-  ```
+```
 
 * **Запуск в headless-режиме (без графического интерфейса браузера):**
-  ```bash
+```bash
   mvn clean test -Dheadless=true
-  ```
+ ```
 
 * **Ускоренный запуск в офлайн-режиме Maven (если зависимости уже загружены в локальный кэш):**
-  ```bash
+```bash
   mvn -o clean test -Dsuite=smoke
-  ```
+ ```
 
 ### 3. Формирование и просмотр отчёта Allure
 После завершения тестов сгенерируйте и откройте интерактивный HTML-отчёт в браузере (включает вложенные шаги `@Step`, группировку по `@Epic`/`@Feature`, скриншоты при падениях и исходный HTML-код страницы `Page Source`):
 ```bash
-mvn allure:serve
-```
+  mvn allure:serve
+ ```
+**Ускоренный запуск в офлайн-режиме (если зависимости уже загружены в локальный кэш):**
+  ```bash
+  mvn allure:serve -o
+  ```
