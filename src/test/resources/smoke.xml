@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="SmokeSuite">
+
+    <test name="ChromeSmokeTests">
+        <parameter name="browser" value="chrome"/>
+        <classes>
+            <class name="tests.LoginTest">
+                <methods>
+                    <include name="login"/>
+                    <include name="logOut"/>
+                </methods>
+            </class>
+            <class name="tests.SearchTest">
+                <methods>
+                    <include name="defaultEmployeeListShownAfterLogin"/>
+                    <include name="combinedSearch"/>
+                    <include name="resetFiltersRestoresFullList"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
+
+</suite>

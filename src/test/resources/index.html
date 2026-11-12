@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Поиск сотрудников</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/2.27.4/css/uikit.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/2.27.4/css/uikit.almost-flat.min.css" />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/2.27.4/js/uikit.min.js"></script>
+
+    <style type="text/css">
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background: #f5f7fa;
+        }
+
+        .page-outer {
+            width: 100%;
+            min-height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px 16px;
+            box-sizing: border-box;
+        }
+
+        .auth-card {
+            width: 100%;
+            max-width: 420px;
+            background: #fff;
+            border: 1px solid #dde3ea;
+            border-radius: 4px;
+            padding: 28px 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .auth-card h1 {
+            margin: 0 0 8px;
+            font-size: 22px;
+            font-weight: 600;
+        }
+
+        .auth-card .subtitle {
+            margin: 0 0 20px;
+            color: #666;
+            font-size: 13px;
+        }
+
+        .app-shell {
+            width: 100%;
+            max-width: 1100px;
+        }
+
+        .app-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            padding: 12px 16px;
+            background: #fff;
+            border: 1px solid #dde3ea;
+            border-radius: 4px;
+        }
+
+        .app-header h1 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .app-header .user-info {
+            color: #666;
+            font-size: 13px;
+            margin-right: 12px;
+        }
+
+        .panel {
+            background: #fff;
+            border: 1px solid #dde3ea;
+            border-radius: 4px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        .panel h2 {
+            margin: 0 0 16px;
+            font-size: 16px;
+            font-weight: 600;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .form-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .form-pair {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px 20px;
+            align-items: start;
+        }
+
+        .form-pair .field {
+            display: grid;
+            grid-template-rows: 22px 36px;
+            gap: 6px;
+            min-width: 0;
+        }
+
+        .form-pair .field.full-width {
+            grid-column: 1 / -1;
+            grid-template-rows: 22px auto;
+        }
+
+        .form-pair .field > label {
+            display: block;
+            margin: 0;
+            padding: 0;
+            height: 22px;
+            line-height: 22px;
+            font-size: 14px;
+            font-weight: normal;
+            color: #444;
+        }
+
+        .form-pair .field > input,
+        .form-pair .field > select {
+            display: block;
+            width: 100%;
+            max-width: 100%;
+            height: 36px;
+            margin: 0;
+            padding: 0 10px;
+            box-sizing: border-box;
+            border: 1px solid #ccd3db;
+            border-radius: 3px;
+            background: #fff;
+            font: 14px/36px inherit;
+            color: #333;
+        }
+
+        .form-pair .field > input[type="number"] {
+            -moz-appearance: textfield;
+        }
+
+        .form-pair .field > input[type="number"]::-webkit-outer-spin-button,
+        .form-pair .field > input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .form-pair .field > input[type="date"] {
+            line-height: 34px;
+        }
+
+        .uk-form-row {
+            margin-bottom: 0;
+        }
+
+        .field-hint {
+            display: block;
+            margin-top: 4px;
+            color: #888;
+            font-size: 12px;
+        }
+
+        .checkbox-group,
+        .radio-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px 20px;
+            padding-top: 4px;
+        }
+
+        .checkbox-group label,
+        .radio-group label {
+            margin: 0;
+            cursor: pointer;
+            font-weight: normal;
+        }
+
+        .actions-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 18px;
+            flex-wrap: wrap;
+        }
+
+        .results-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 13px;
+            color: #555;
+        }
+
+        #resultsTable tbody tr.hidden-row {
+            display: none;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 24px;
+            color: #888;
+        }
+
+        .form-alert {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin: 0 0 14px;
+            padding: 12px 14px;
+            border-radius: 8px;
+            border: 1px solid #f5c2c7;
+            background: linear-gradient(180deg, #fff5f5 0%, #ffe8ea 100%);
+            color: #842029;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 8px rgba(132, 32, 41, 0.08);
+            animation: alert-in 0.25s ease-out;
+        }
+
+        .form-alert__icon {
+            flex: 0 0 auto;
+            width: 22px;
+            height: 22px;
+            margin-top: 1px;
+            border-radius: 50%;
+            background: #dc3545;
+            color: #fff;
+            font-size: 13px;
+            font-weight: 700;
+            line-height: 22px;
+            text-align: center;
+        }
+
+        .form-alert__body {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .form-alert__title {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .form-alert__text {
+            display: block;
+            opacity: 0.92;
+        }
+
+        .form-alert__close {
+            flex: 0 0 auto;
+            border: 0;
+            background: transparent;
+            color: #842029;
+            font-size: 18px;
+            line-height: 1;
+            cursor: pointer;
+            padding: 0 2px;
+            opacity: 0.7;
+        }
+
+        .form-alert__close:hover {
+            opacity: 1;
+        }
+
+        .input-error {
+            border-color: #dc3545 !important;
+            background: #fff8f8 !important;
+            box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.15);
+        }
+
+        @keyframes alert-in {
+            from {
+                opacity: 0;
+                transform: translateY(-6px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 760px) {
+            .form-grid,
+            .form-pair {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+
+    <script type="text/javascript">
+        $(function () {
+            function isValidEmail(value) {
+                if (typeof value !== "string") {
+                    return false;
+                }
+
+                var email = $.trim(value);
+                if (!email || email.length > 254) {
+                    return false;
+                }
+
+                // пробелы и управляющие символы
+                if (/[\s\x00-\x1F\x7F]/.test(email)) {
+                    return false;
+                }
+
+                // ровно один символ @
+                var atIndex = email.indexOf("@");
+                if (atIndex < 1 || atIndex !== email.lastIndexOf("@")) {
+                    return false;
+                }
+
+                var local = email.slice(0, atIndex);
+                var domain = email.slice(atIndex + 1);
+
+                if (local.length < 1 || local.length > 64) {
+                    return false;
+                }
+                if (domain.length < 4 || domain.length > 253) {
+                    return false;
+                }
+
+                // локальная часть: буквы, цифры, . _ % + -
+                // не начинается и не заканчивается точкой, без ".."
+                if (!/^[A-Za-z0-9]+(?:[._%+-][A-Za-z0-9]+)*$/.test(local)) {
+                    return false;
+                }
+
+                // домен: label.label...tld, TLD >= 2 буквы
+                if (!/^[A-Za-z0-9]+(?:-[A-Za-z0-9]+)*(?:\.[A-Za-z0-9]+(?:-[A-Za-z0-9]+)*)*\.[A-Za-z]{2,}$/.test(domain)) {
+                    return false;
+                }
+
+                return true;
+            }
+
+            function showEmailFormatError(holderSelector, inputSelector, alertId) {
+                showAlert(holderSelector, alertId, "Неверный формат Email", {
+                    title: "Проверьте Email",
+                    hint: "Пример: name@example.com"
+                });
+                $(inputSelector).addClass("input-error").focus();
+            }
+
+            var employees = [
+                { id: 1, email: "ivanov@company.ru", name: "Иван Иванов", gender: "Мужской", age: 28, position: "Специалист по автоматизированному тестированию", hired: "2022-03-15", skills: ["Selenium", "API"] },
+                { id: 2, email: "petrova@company.ru", name: "Мария Петрова", gender: "Женский", age: 31, position: "Специалист по ручному тестированию", hired: "2021-07-01", skills: ["Manual", "SQL"] },
+                { id: 3, email: "sidorov@company.ru", name: "Алексей Сидоров", gender: "Мужской", age: 26, position: "Backend-разработчик", hired: "2023-01-20", skills: ["Java", "API"] },
+                { id: 4, email: "smirnova@company.ru", name: "Елена Смирнова", gender: "Женский", age: 29, position: "Frontend-разработчик", hired: "2020-11-10", skills: ["JS", "UI"] },
+                { id: 5, email: "kuznetsov@company.ru", name: "Дмитрий Кузнецов", gender: "Мужской", age: 35, position: "HR-менеджер", hired: "2019-05-05", skills: ["Soft skills"] },
+                { id: 6, email: "volkova@company.ru", name: "Анна Волкова", gender: "Женский", age: 24, position: "Специалист по автоматизированному тестированию", hired: "2024-02-12", skills: ["Selenium", "JS"] },
+                { id: 7, email: "orlov@company.ru", name: "Павел Орлов", gender: "Мужской", age: 33, position: "Специалист поддержки", hired: "2018-09-01", skills: ["SQL", "Manual"] },
+                { id: 8, email: "novikova@company.ru", name: "Ольга Новикова", gender: "Женский", age: 30, position: "Fullstack-разработчик", hired: "2021-12-03", skills: ["Java", "JS", "API"] }
+            ];
+
+            function showAlert(holderSelector, id, message, options) {
+                options = options || {};
+                $("#" + id).remove();
+
+                var title = options.title || "Ошибка";
+                var hint = options.hint || "";
+                var hintHtml = hint
+                    ? '<span class="form-alert__text">' + hint + '</span>'
+                    : '';
+
+                $(holderSelector).append(
+                    '<div id="' + id + '" class="form-alert" role="alert">' +
+                    '<span class="form-alert__icon" aria-hidden="true">!</span>' +
+                    '<div class="form-alert__body">' +
+                    '<span class="form-alert__title">' + title + '</span>' +
+                    '<span class="form-alert__text">' + message + '</span>' +
+                    hintHtml +
+                    '</div>' +
+                    '<button type="button" class="form-alert__close" aria-label="Закрыть">&times;</button>' +
+                    '</div>'
+                );
+
+                $("#" + id + " .form-alert__close").on("click", function () {
+                    $("#" + id).remove();
+                });
+            }
+
+            function clearAlerts(holderSelector) {
+                $(holderSelector).empty();
+                $(".input-error").removeClass("input-error");
+            }
+
+            function renderResults(list) {
+                var $tbody = $("#resultsTable tbody");
+                $tbody.empty();
+
+                if (!list.length) {
+                    $("#resultsEmpty").show();
+                    $("#resultsCount").text("Найдено: 0");
+                    return;
+                }
+
+                $("#resultsEmpty").hide();
+                $("#resultsCount").text("Найдено: " + list.length);
+
+                list.forEach(function (emp) {
+                    var row =
+                        "<tr data-id=\"" + emp.id + "\">" +
+                        "<td>" + emp.id + "</td>" +
+                        "<td>" + emp.email + "</td>" +
+                        "<td>" + emp.name + "</td>" +
+                        "<td>" + emp.gender + "</td>" +
+                        "<td>" + emp.age + "</td>" +
+                        "<td>" + emp.position + "</td>" +
+                        "<td>" + emp.hired + "</td>" +
+                        "<td>" + emp.skills.join(", ") + "</td>" +
+                        "</tr>";
+                    $tbody.append(row);
+                });
+            }
+
+            function getSelectedSkills() {
+                var skills = [];
+                $("input[name='searchSkill']:checked").each(function () {
+                    skills.push($(this).val());
+                });
+                return skills;
+            }
+
+            function filterEmployees() {
+                var email = $.trim($("#searchEmail").val()).toLowerCase();
+                var name = $.trim($("#searchName").val()).toLowerCase();
+                var gender = $("#searchGender").val();
+                var age = $("#searchAge").val();
+                var dateFrom = $("#searchDateFrom").val();
+                var dateTo = $("#searchDateTo").val();
+                var skills = getSelectedSkills();
+
+                return employees.filter(function (emp) {
+                    if (email && emp.email.toLowerCase().indexOf(email) === -1) return false;
+                    if (name && emp.name.toLowerCase().indexOf(name) === -1) return false;
+                    if (gender && emp.gender !== gender) return false;
+                    if (age !== "" && emp.age !== Number(age)) return false;
+                    if (dateFrom && emp.hired < dateFrom) return false;
+                    if (dateTo && emp.hired > dateTo) return false;
+                    if (skills.length) {
+                        var hasAll = skills.every(function (s) {
+                            return emp.skills.indexOf(s) !== -1;
+                        });
+                        if (!hasAll) return false;
+                    }
+                    return true;
+                });
+            }
+
+            function validateSearch() {
+                clearAlerts("#searchAlertsHolder");
+
+                var email = $.trim($("#searchEmail").val());
+                var dateFrom = $("#searchDateFrom").val();
+                var dateTo = $("#searchDateTo").val();
+                var valid = true;
+
+                // если поле заполнено — проверяем полный формат Email
+                if (email && !isValidEmail(email)) {
+                    showEmailFormatError("#searchAlertsHolder", "#searchEmail", "searchEmailFormatError");
+                    valid = false;
+                }
+
+                if (dateFrom && dateTo && dateFrom > dateTo) {
+                    showAlert("#searchAlertsHolder", "searchDateRangeError", "Дата «с» не может быть позже даты «по»", {
+                        title: "Некорректный период"
+                    });
+                    valid = false;
+                }
+
+                return valid;
+            }
+
+            function resetSearchForm() {
+                $("#searchForm")[0].reset();
+                $("#searchGender").val("");
+                $("input[name='searchSkill']").prop("checked", false);
+                clearAlerts("#searchAlertsHolder");
+                renderResults(employees);
+                $("#lastSearchInfo").text("Фильтры сброшены. Показаны все записи.");
+            }
+
+            $("#authButton").click(function () {
+                clearAlerts("#authAlertsHolder");
+
+                var e = $.trim($("#loginEmail").val());
+                var p = $("#loginPassword").val();
+
+                if (!isValidEmail(e)) {
+                    showEmailFormatError("#authAlertsHolder", "#loginEmail", "emailFormatError");
+                } else if (e !== "test@test.test" || p !== "test") {
+                    showAlert("#authAlertsHolder", "invalidEmailPassword", "Неверный Email или пароль", {
+                        title: "Ошибка входа"
+                    });
+                    $("#loginEmail, #loginPassword").addClass("input-error");
+                } else {
+                    $("#authUserEmail").text(e);
+                    $("#authPage").hide();
+                    $("#searchPage").show();
+                    renderResults(employees);
+                    $("#lastSearchInfo").text("Показаны все сотрудники. Заполните фильтры и нажмите «Найти».");
+                }
+
+                return false;
+            });
+
+            $("#searchButton").click(function () {
+                if (!validateSearch()) {
+                    return false;
+                }
+
+                var results = filterEmployees();
+                renderResults(results);
+                $("#lastSearchInfo").text("Поиск выполнен: " + new Date().toLocaleString("ru-RU"));
+                return false;
+            });
+
+            $("#resetSearchButton").click(function () {
+                resetSearchForm();
+                return false;
+            });
+
+            $("#logoutButton").click(function () {
+                $("#searchPage").hide();
+                $("#authPage").show();
+                $("#loginEmail").val("");
+                $("#loginPassword").val("");
+                clearAlerts("#authAlertsHolder");
+                resetSearchForm();
+                return false;
+            });
+
+            // Enter in auth fields
+            $("#loginEmail, #loginPassword").keypress(function (e) {
+                if (e.which === 13) {
+                    $("#authButton").click();
+                    return false;
+                }
+            });
+
+            $("#loginEmail, #loginPassword, #searchEmail").on("input", function () {
+                $(this).removeClass("input-error");
+            });
+        });
+    </script>
+</head>
+<body>
+    <!-- Страница авторизации -->
+    <div class="page-outer" id="authPage">
+        <div class="auth-card">
+            <h1>Вход в систему</h1>
+            <p class="subtitle">Учётка для теста: test@test.test / test</p>
+            <form class="uk-form uk-form-stacked" onsubmit="return false;">
+                <div class="uk-form-row" id="authAlertsHolder"></div>
+                <div class="uk-form-row" style="margin-bottom: 12px;">
+                    <label class="uk-form-label" for="loginEmail">Email:</label>
+                    <input type="text" id="loginEmail" name="loginEmail" class="uk-width-1-1" placeholder="user@example.com" autocomplete="username" />
+                </div>
+                <div class="uk-form-row uk-form-password" style="margin-bottom: 16px;">
+                    <label class="uk-form-label" for="loginPassword">Пароль:</label>
+                    <input type="password" id="loginPassword" name="loginPassword" class="uk-width-1-1" placeholder="Пароль" autocomplete="current-password" />
+                </div>
+                <div class="uk-form-row">
+                    <button class="uk-button uk-button-primary uk-width-1-1" type="submit" id="authButton">Вход</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Страница поиска после авторизации -->
+    <div class="page-outer" id="searchPage" style="display: none;">
+        <div class="app-shell">
+            <div class="app-header">
+                <h1>Поиск сотрудников</h1>
+                <div>
+                    <span class="user-info">Вы вошли как <strong id="authUserEmail"></strong></span>
+                    <button class="uk-button" type="button" id="logoutButton">Выйти</button>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h2>Параметры поиска</h2>
+                <form class="uk-form uk-form-stacked" id="searchForm" onsubmit="return false;">
+                    <div class="uk-form-row full-width" id="searchAlertsHolder" style="margin-bottom: 12px;"></div>
+
+                    <div class="form-grid">
+                        <div class="form-pair">
+                            <div class="field">
+                                <label class="uk-form-label" for="searchEmail">Email:</label>
+                                <input type="text" id="searchEmail" name="searchEmail" />
+                            </div>
+                            <div class="field">
+                                <label class="uk-form-label" for="searchName">ФИО:</label>
+                                <input type="text" id="searchName" name="searchName" placeholder="Имя или фамилия" />
+                            </div>
+                        </div>
+
+                        <div class="form-pair">
+                            <div class="field">
+                                <label class="uk-form-label" for="searchGender">Пол:</label>
+                                <select id="searchGender" name="searchGender">
+                                    <option value="">Любой</option>
+                                    <option value="Мужской">Мужской</option>
+                                    <option value="Женский">Женский</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label class="uk-form-label" for="searchAge">Возраст:</label>
+                                <input type="number" id="searchAge" name="searchAge" min="18" max="70" placeholder="Точный возраст" />
+                            </div>
+                        </div>
+
+                        <div class="form-pair">
+                            <div class="field">
+                                <label class="uk-form-label" for="searchDateFrom">Дата приёма с:</label>
+                                <input type="date" id="searchDateFrom" name="searchDateFrom" />
+                            </div>
+                            <div class="field">
+                                <label class="uk-form-label" for="searchDateTo">Дата приёма по:</label>
+                                <input type="date" id="searchDateTo" name="searchDateTo" />
+                            </div>
+                        </div>
+
+                        <div class="form-pair">
+                            <div class="field full-width">
+                                <label class="uk-form-label">Навыки:</label>
+                                <div class="checkbox-group" id="searchSkillsGroup">
+                                    <label><input type="checkbox" name="searchSkill" id="searchSkillSelenium" value="Selenium"> Selenium</label>
+                                    <label><input type="checkbox" name="searchSkill" id="searchSkillApi" value="API"> API</label>
+                                    <label><input type="checkbox" name="searchSkill" id="searchSkillSql" value="SQL"> SQL</label>
+                                    <label><input type="checkbox" name="searchSkill" id="searchSkillJs" value="JS"> JS</label>
+                                    <label><input type="checkbox" name="searchSkill" id="searchSkillJava" value="Java"> Java</label>
+                                    <label><input type="checkbox" name="searchSkill" id="searchSkillManual" value="Manual"> Manual</label>
+                                    <label><input type="checkbox" name="searchSkill" id="searchSkillUi" value="UI"> UI</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="actions-row">
+                        <button class="uk-button uk-button-primary" type="submit" id="searchButton">Найти</button>
+                        <button class="uk-button" type="button" id="resetSearchButton">Сбросить</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="panel">
+                <h2>Результаты поиска</h2>
+                <div class="results-meta">
+                    <span id="resultsCount">Найдено: 0</span>
+                    <span id="lastSearchInfo"></span>
+                </div>
+
+                <div class="uk-overflow-container">
+                    <table class="uk-table uk-table-striped uk-table-condensed" id="resultsTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Email</th>
+                                <th>ФИО</th>
+                                <th>Пол</th>
+                                <th>Возраст</th>
+                                <th>Должность</th>
+                                <th>Приём</th>
+                                <th>Навыки</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div class="empty-state" id="resultsEmpty" style="display: none;">
+                    По заданным фильтрам ничего не найдено
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
